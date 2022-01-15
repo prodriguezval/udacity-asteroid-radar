@@ -1,4 +1,4 @@
-package com.udacity.asteroidradar.infrastructure.network.nasa
+package com.udacity.asteroidradar.infrastructure.network
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -26,7 +26,7 @@ private val nasaHttpService = Retrofit
 
 interface NasaApiService {
     @GET("planetary/apod?api_key=${BuildConfig.NASA_API_KEY}")
-    suspend fun getImageOfTheDay(): PictureOfDay
+    suspend fun getPictureOfDay(): PictureOfDay
 
     @GET("neo/rest/v1/feed?api_key=${BuildConfig.NASA_API_KEY}")
     suspend fun getAsteroidData(

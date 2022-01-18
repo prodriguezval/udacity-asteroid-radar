@@ -1,8 +1,9 @@
-package com.udacity.asteroidradar
+package com.udacity.asteroidradar.main
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.databinding.ListItemAsteroidBinding
 
 class AsteroidViewHolder private constructor(private val binding: ListItemAsteroidBinding) :

@@ -6,13 +6,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.udacity.asteroidradar.Asteroid
-import com.udacity.asteroidradar.infrastructure.database.SpaceDatabase
 import com.udacity.asteroidradar.infrastructure.repository.NasaRepository
 import kotlinx.coroutines.launch
 
-class MainViewModel(app: Application) : AndroidViewModel(app) {
-    private val spaceDatabase = SpaceDatabase.getInstance(app)
-    private val nasaRepository = NasaRepository(spaceDatabase)
+class MainViewModel(
+    private val nasaRepository: NasaRepository,
+    app: Application
+) : AndroidViewModel(app) {
 
     val asteroids = nasaRepository.getAsteroids()
 

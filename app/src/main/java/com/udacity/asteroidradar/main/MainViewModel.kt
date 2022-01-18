@@ -19,10 +19,21 @@ class MainViewModel : ViewModel() {
     private val _asteroids = MutableLiveData<List<Asteroid>>()
     val asteroids: LiveData<List<Asteroid>>
         get() = _asteroids
+    private val _navigateToAsteroidDetailFragment = MutableLiveData<Asteroid?>()
+    val navigateToAsteroidDetailFragment
+        get() = _navigateToAsteroidDetailFragment
 
     init {
         getPictureOfDay()
         getAsteroids()
+    }
+
+    fun onAsteroidClick(data: Asteroid) {
+        _navigateToAsteroidDetailFragment.value = data
+    }
+
+    fun onDetailFragmentNavigated() {
+        _navigateToAsteroidDetailFragment.value = null
     }
 
     private fun getPictureOfDay() {
@@ -33,7 +44,7 @@ class MainViewModel : ViewModel() {
 
     private fun getAsteroids() {
         viewModelScope.launch {
-            _asteroids.value = nasaRepository.getAsteroids("2022-01-17", "2022-01-24")
+            _asteroids.value = nasaRepository.getAsteroids("2022-01-18", "2022-01-25")
         }
     }
 

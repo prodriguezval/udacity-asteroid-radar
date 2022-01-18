@@ -3,7 +3,7 @@ package com.udacity.asteroidradar
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import com.bumptech.glide.Glide
+import com.squareup.picasso.Picasso
 
 @BindingAdapter("statusIcon")
 fun bindAsteroidStatusImage(imageView: ImageView, isHazardous: Boolean) {
@@ -44,10 +44,8 @@ fun bindTextViewToDisplayVelocity(textView: TextView, number: Double) {
 @BindingAdapter("pictureOfDay")
 fun bindImageViewPictureOfDay(imageView: ImageView, pictureOfDay: PictureOfDay?) {
     if (pictureOfDay != null) {
-        Glide
-            .with(imageView.context)
+        Picasso.with(imageView.context)
             .load(pictureOfDay.url)
-            .centerCrop()
             .into(imageView)
 
         val strFormat =

@@ -33,7 +33,7 @@ class AsteroidApp : Application() {
             .build()
         WorkManager.getInstance().enqueueUniquePeriodicWork(
             "AsteroidRefresherWork",
-            ExistingPeriodicWorkPolicy.KEEP, // keep - will disregard the new request
+            ExistingPeriodicWorkPolicy.KEEP,
             repeatingRefreshRequest
         )
     }

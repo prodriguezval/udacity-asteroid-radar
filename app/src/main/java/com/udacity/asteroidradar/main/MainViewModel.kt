@@ -1,6 +1,7 @@
 package com.udacity.asteroidradar.main
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.infrastructure.repository.NasaRepository
 import kotlinx.coroutines.launch
+
+private const val TAG = "MainViewModel"
 
 class MainViewModel(
     private val nasaRepository: NasaRepository,
@@ -25,8 +28,15 @@ class MainViewModel(
         get() = _navigateToAsteroidDetailFragment
 
     init {
-        getPictureOfDay()
-        refreshAsteroids()
+        viewModelScope.launch {
+            try {
+                getPictureOfDay()
+                refreshAsteroids()
+            } catch (e: Exception) {
+                Log.i(TAG, "Error loading remote data ${e.message}")
+            }
+        }
+
     }
 
     fun onAsteroidClick(data: Asteroid) {
@@ -37,21 +47,13 @@ class MainViewModel(
         _navigateToAsteroidDetailFragment.value = null
     }
 
-    private fun getPictureOfDay() {
-        viewModelScope.launch {
-            _pictureOfDay.value = nasaRepository.getPictureOfDay()
-        }
+    private suspend fun getPictureOfDay() {
+        _pictureOfDay.value = nasaRepository.getPictureOfDay()
+
     }
 
-    private fun refreshAsteroids() {
-        viewModelScope.launch {
-            try {
-                nasaRepository.saveAsteroids()
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+    private suspend fun refreshAsteroids() {
+        nasaRepository.saveAsteroids()
     }
 
 

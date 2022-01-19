@@ -47,10 +47,20 @@ fun bindImageViewPictureOfDay(imageView: ImageView, pictureOfDay: PictureOfDay?)
     if (pictureOfDay != null) {
         Picasso.with(imageView.context)
             .load(pictureOfDay.url)
+            .placeholder(R.drawable.placeholder_picture_of_day)
+            .error(R.drawable.no_image_loaded)
+            .fit()
             .into(imageView)
 
-        val strFormat =
-            imageView.resources.getString(R.string.nasa_picture_of_day_content_description_format)
-        imageView.contentDescription = String.format(strFormat, pictureOfDay.title)
+        imageView.contentDescription = String.format(
+            imageView.resources.getString(R.string.nasa_picture_of_day_content_description_format),
+            pictureOfDay.title
+        )
+    } else {
+        imageView.setImageResource(R.drawable.placeholder_picture_of_day)
+        imageView.contentDescription = String.format(
+            imageView.resources.getString(R.string.nasa_picture_of_day_content_description_format),
+            R.string.this_is_nasa_s_picture_of_day_showing_nothing_yet
+        )
     }
 }

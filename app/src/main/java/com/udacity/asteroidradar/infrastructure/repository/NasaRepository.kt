@@ -1,10 +1,9 @@
 package com.udacity.asteroidradar.infrastructure.repository
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import com.udacity.asteroidradar.Asteroid
-import com.udacity.asteroidradar.Constants
+import com.udacity.asteroidradar.getSeventhDayFromToday
+import com.udacity.asteroidradar.getToday
 import com.udacity.asteroidradar.infrastructure.database.AsteroidDao
 import com.udacity.asteroidradar.infrastructure.database.entity.asAsteroids
 import com.udacity.asteroidradar.infrastructure.database.entity.asEntities
@@ -15,10 +14,8 @@ import com.udacity.asteroidradar.main.PictureOfDay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import java.text.SimpleDateFormat
-import java.util.*
 
-const val TAG = "NasaRepository"
+private const val TAG = "NasaRepository"
 
 class NasaRepository(private val asteroidDao: AsteroidDao) {
     private val nasaNetwork: NasaApiService = NasaApi.httpService;
@@ -34,11 +31,23 @@ class NasaRepository(private val asteroidDao: AsteroidDao) {
         }
     }
 
-    fun getAsteroids(): LiveData<List<Asteroid>> =
-        Transformations.map(asteroidDao.getAsteroids()) {
-            it.asAsteroids()
+    suspend fun getAsteroidsByDate(startDate: String, endDate: String): List<Asteroid> {
+        var asteroids: List<Asteroid>
+        withContext(Dispatchers.IO) {
+            asteroids =
+                asteroidDao.getAsteroidsByCloseApproachDate(startDate, endDate).asAsteroids()
         }
+        return asteroids
+    }
 
+
+    suspend fun getAsteroids(): List<Asteroid> {
+        var asteroids: List<Asteroid>
+        withContext(Dispatchers.IO) {
+            asteroids = asteroidDao.getAsteroids().asAsteroids()
+        }
+        return asteroids
+    }
 
     suspend fun getPictureOfDay(): PictureOfDay {
         var pictureOfDay: PictureOfDay
@@ -46,18 +55,5 @@ class NasaRepository(private val asteroidDao: AsteroidDao) {
             pictureOfDay = nasaNetwork.getPictureOfDay()
         }
         return pictureOfDay
-    }
-
-    private fun getToday() = formatDate(Calendar.getInstance().time)
-
-    private fun getSeventhDayFromToday(): String {
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, 7)
-        return formatDate(calendar.time)
-    }
-
-    private fun formatDate(date: Date): String {
-        val dateFormat = SimpleDateFormat(Constants.API_QUERY_DATE_FORMAT, Locale.getDefault())
-        return dateFormat.format(date)
     }
 }

@@ -11,10 +11,13 @@ import com.udacity.asteroidradar.infrastructure.database.SpaceDatabase
 import com.udacity.asteroidradar.infrastructure.repository.NasaRepository
 
 class MainFragment : Fragment() {
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        val binding = FragmentMainBinding.inflate(inflater)
+    private lateinit var binding: FragmentMainBinding
+    private lateinit var viewModel: MainViewModel
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentMainBinding.inflate(inflater)
         binding.lifecycleOwner = this
 
         val application = requireNotNull(this.activity).application
@@ -22,18 +25,17 @@ class MainFragment : Fragment() {
         val nasaRepository = NasaRepository(spaceDatabase.asteroidDao)
         val mainViewModelFactory = MainViewModelFactory(nasaRepository, application)
 
-        val viewModel = ViewModelProvider(this, mainViewModelFactory)[MainViewModel::class.java]
-
+        viewModel = ViewModelProvider(this, mainViewModelFactory)[MainViewModel::class.java]
         binding.viewModel = viewModel
         val asteroidAdapter = AsteroidAdapter(AsteroidListener { asteroid ->
             viewModel.onAsteroidClick(asteroid)
         })
-
         binding.asteroidRecycler.adapter = asteroidAdapter
-        viewModel.asteroids.observe(viewLifecycleOwner) { asteroids ->
-            asteroidAdapter.submitList(asteroids)
-        }
-
+        viewModel.asteroids.observe(viewLifecycleOwner, { asteroids ->
+            if (asteroids != null) {
+                asteroidAdapter.submitList(asteroids)
+            }
+        })
         viewModel.navigateToAsteroidDetailFragment.observe(viewLifecycleOwner, { asteroid ->
             asteroid?.let {
                 findNavController().navigate(MainFragmentDirections.actionShowDetail(it))
@@ -41,9 +43,7 @@ class MainFragment : Fragment() {
             }
         })
 
-
         setHasOptionsMenu(true)
-
         return binding.root
     }
 
@@ -53,6 +53,11 @@ class MainFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.show_week_asteroids_menu -> viewModel.onClickViewWeekAsteroids()
+            R.id.show_today_asteroids_menu -> viewModel.onClickTodayAsteroids()
+            R.id.show_saved_asteroid_menu -> viewModel.onClickSavedAsteroids()
+        }
         return true
     }
 }

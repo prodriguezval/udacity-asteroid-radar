@@ -12,6 +12,8 @@ import com.udacity.asteroidradar.infrastructure.network.NasaApiService
 import com.udacity.asteroidradar.infrastructure.network.parseAsteroidsJsonResult
 import com.udacity.asteroidradar.main.PictureOfDay
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
@@ -31,20 +33,20 @@ class NasaRepository(private val asteroidDao: AsteroidDao) {
         }
     }
 
-    suspend fun getAsteroidsByDate(startDate: String, endDate: String): List<Asteroid> {
-        var asteroids: List<Asteroid>
+    suspend fun getAsteroidsByDate(startDate: String, endDate: String): Flow<List<Asteroid>> {
+        var asteroids: Flow<List<Asteroid>>
         withContext(Dispatchers.IO) {
-            asteroids =
-                asteroidDao.getAsteroidsByCloseApproachDate(startDate, endDate).asAsteroids()
+            asteroids = asteroidDao.getAsteroidsByCloseApproachDate(startDate, endDate)
+                .map { it.asAsteroids() }
         }
         return asteroids
     }
 
 
-    suspend fun getAsteroids(): List<Asteroid> {
-        var asteroids: List<Asteroid>
+    suspend fun getAsteroids(): Flow<List<Asteroid>> {
+        var asteroids: Flow<List<Asteroid>>
         withContext(Dispatchers.IO) {
-            asteroids = asteroidDao.getAsteroids().asAsteroids()
+            asteroids = asteroidDao.getAsteroids().map { it.asAsteroids() }
         }
         return asteroids
     }

@@ -10,6 +10,7 @@ import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.getSeventhDayFromToday
 import com.udacity.asteroidradar.getToday
 import com.udacity.asteroidradar.infrastructure.repository.NasaRepository
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 private const val TAG = "MainViewModel"
@@ -19,8 +20,8 @@ class MainViewModel(
     app: Application
 ) : AndroidViewModel(app) {
 
-    private var _asteroids = MutableLiveData<List<Asteroid?>>()
-    val asteroids: LiveData<List<Asteroid?>>
+    private var _asteroids = MutableLiveData<List<Asteroid>>()
+    val asteroids: LiveData<List<Asteroid>>
         get() = _asteroids
 
     private val _pictureOfDay = MutableLiveData<PictureOfDay>()
@@ -76,7 +77,9 @@ class MainViewModel(
     fun onClickSavedAsteroids() {
         _asteroids.value = emptyList()
         viewModelScope.launch {
-            _asteroids.value = nasaRepository.getAsteroids()
+            nasaRepository.getAsteroids().collect {
+                _asteroids.value = it
+            }
         }
     }
 
@@ -86,7 +89,9 @@ class MainViewModel(
     ) {
         _asteroids.value = emptyList()
         viewModelScope.launch {
-            _asteroids.value = nasaRepository.getAsteroidsByDate(startDate, endDate)
+            nasaRepository.getAsteroidsByDate(startDate, endDate).collect {
+                _asteroids.value = it
+            }
             Log.i(TAG, "asteroids size: ${asteroids.value?.size}")
         }
     }
